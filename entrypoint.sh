@@ -1,80 +1,58 @@
-#!/bin/sh
-
-set -eu
-
-TROJAN_CERT_DIR=/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory
+#!/bin/bash
+# FILE="/etc/Caddy"
+DOMAIN="${DOMAIN}"
+UUID="${UUID:-$(cat /proc/sys/kernel/random/uuid)}"
+ALTER_ID="${ALTER_ID:-64}"
+PROXY_PATH="${PROXY_PATH:-/}"
+PROXY_PORT="${PROXY_PORT:-80}"
 
 echo "生成Caddyfile..."
-cat > /etc/caddy/Caddyfile <<-EOF
-http://${DOMAIN}:${REMOTE_PORT:-80} {
-    root * /opt/trojan/wwwroot
-    log {
-        output file /var/log/caddy.log
-    }
-    file_server
-}
-https://${DOMAIN}:8443 {
-    root * /opt/trojan/wwwroot
-    log {
-        output file /var/log/caddy.log
-    }
-    file_server
+cat > /etc/Caddyfile <<'EOF'
+${DOMAIN} {
+  log ./caddy.log
+  proxy ${PROXY_PATH} :${PROXY_PORT} {
+    websocket
+    header_upstream -Origin
+  }
 }
 EOF
 
 echo "启动caddy..."
-caddy start --config /etc/caddy/Caddyfile --adapter caddyfile
+caddy start --config /etc/Caddyfile --adapter caddyfile
 
-while [ ! -f ${TROJAN_CERT_DIR}/${DOMAIN}/${DOMAIN}.crt ]; do
-  echo "等待证书生成..."
-  sleep 5
-done
-
-echo "生成trojan配置..."
-cat > /etc/trojan-go/config.json <<-EOF
+echo "生成v2ray配置..."
+cat > /etc/v2ray/config.json <<-EOF
 {
-    "run_type": "server",
-    "local_addr": "0.0.0.0",
-    "local_port": ${LOCAL_PORT:-443},
-    "remote_addr": "${DOMAIN}",
-    "remote_port": ${REMOTE_PORT:-80},
-    "password": [
-        "${PASSWORD:-123456}"
-    ],
-    "log_level": 1,
-    "ssl": {
-        "cert": "${TROJAN_CERT_DIR}/${DOMAIN}/${DOMAIN}.crt",
-        "key": "${TROJAN_CERT_DIR}/${DOMAIN}/${DOMAIN}.key",
-        "key_password": "",
-        "cipher_tls13":"TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384",
-        "prefer_server_cipher": true,
-        "alpn": [
-            "http/1.1"
-        ],
-        "reuse_session": true,
-        "session_ticket": false,
-        "session_timeout": 600,
-        "plain_http_response": "",
-        "curves": "",
-        "dhparam": ""
-    },
-    "tcp": {
-        "prefer_ipv4": false,
-        "no_delay": true,
-        "keep_alive": true,
-        "fast_open": false,
-        "fast_open_qlen": 20
-    },
-    "router":{
-        "enabled": true,
-        "block": [
-            "geoip:private"
+  "inbounds": [
+    {
+      "port": ${PROXY_PORT},
+      "protocol": "vmess",
+      "settings": {
+        "clients": [
+          {
+            "id": "${UUID}",
+            "alterId": ${ALTER_ID}
+          }
         ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+            "path": "${PROXY_PATH}"
+        }
+      }
     }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    }
+  ]
 }
 EOF
 
-echo "trojan链接：trojan://${PASSWORD}@${DOMAIN}:443#${DOMAIN}"
+cat /etc/v2ray/config.json
 
-echo "启动trojan-go..."
-/usr/bin/trojan-go -config /etc/trojan-go/config.json
+echo "启动v2ray..."
+/usr/bin/v2ray -config /etc/v2ray/config.json
