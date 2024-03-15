@@ -59,4 +59,4 @@ EOF
 echo "v2ray url: vmess://$(echo auto:${UUID}@${DOMAIN}:${PROXY_PORT} | base64)?remarks=${DOMAIN}&obfsParam=www.microsoft.com&path=/&obfs=websocket&tfo=1&alterId=${ALTER_ID}"
 
 echo "启动v2ray..."
-/usr/bin/v2ray -config /etc/v2ray.json
+/usr/bin/v2ray run -config /etc/v2ray.json
