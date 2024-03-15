@@ -9,7 +9,6 @@
 * 修改下面命令中的DOMAIN和UUID变量，在VPS上执行
 
 ```bash
-docker volume create trojan_data
 docker run -d \
   --name trojan \
   -p 80:80/tcp \
