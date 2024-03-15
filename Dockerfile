@@ -1,13 +1,4 @@
-FROM abiosoft/caddy:builder as builder
-
-# add this line before you run `/bin/sh /usr/bin/builder.sh`
-ADD https://raw.githubusercontent.com/jeffreystoke/caddy-docker/master/builder/builder.sh /usr/bin/builder.sh
-
-ARG version="1.0.3"
-ARG plugins=""
-ARG enable_telemetry="false"
-
-RUN VERSION=${version} PLUGINS=${plugins} ENABLE_TELEMETRY=${enable_telemetry} /bin/sh /usr/bin/builder.sh
+FROM caddy:2.7.6 as builder
 
 FROM alpine:3.10
 
@@ -47,7 +38,7 @@ RUN apk upgrade --update \
 ENV ACME_AGREE="false"
 
 # install caddy
-COPY --from=builder /install/caddy /usr/bin/caddy
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
 COPY index.html /srv/index.html
 
