@@ -6,7 +6,7 @@
 
 * vps开通80/tcp端口
 * 将你的域名解析到vps服务器
-* 修改下面命令中的DOMAIN和PASSWORD变量，在VPS上执行
+* 修改下面命令中的DOMAIN和UUID变量，在VPS上执行
 
 ```bash
 docker volume create trojan_data

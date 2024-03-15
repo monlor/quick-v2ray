@@ -1,5 +1,4 @@
 #!/bin/bash
-# FILE="/etc/Caddy"
 DOMAIN="${DOMAIN}"
 UUID="${UUID:-$(cat /proc/sys/kernel/random/uuid)}"
 ALTER_ID="${ALTER_ID:-64}"
