@@ -42,7 +42,7 @@ COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
 COPY index.html /srv/index.html
 
-ADD entrypoint.sh /caddy.sh
+ADD entrypoint.sh /entrypoint.sh
 
 EXPOSE 80
 
