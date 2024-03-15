@@ -6,16 +6,18 @@ PROXY_PATH="${PROXY_PATH:-/}"
 PROXY_PORT="${PROXY_PORT:-80}"
 
 echo "生成Caddyfile..."
+# https://guide.v2fly.org/advanced/wss_and_web.html#%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE
 cat > /etc/Caddyfile <<-EOF
-http://${DOMAIN}:${PROXY_PORT}  {
-    @websockets {
-        header Connection *Upgrade*
+http://${DOMAIN}:${PROXY_PORT} {
+    log {
+        output file /var/log/caddy.log
+    }
+    @ws {
+        path ${PROXY_PATH}
+        header Connection Upgrade
         header Upgrade websocket
-        
     }
-    reverse_proxy @websockets ${PROXY_PATH} {
-        header_up -Origin
-    }
+    reverse_proxy @ws localhost:1888
 }
 EOF
 
@@ -27,7 +29,7 @@ cat > /etc/v2ray.json <<-EOF
 {
   "inbounds": [
     {
-      "port": ${PROXY_PORT},
+      "port": 1888,
       "protocol": "vmess",
       "settings": {
         "clients": [
