@@ -10,7 +10,7 @@ echo "生成Caddyfile..."
 cat > /etc/Caddyfile <<-EOF
 http://${DOMAIN}:${PROXY_PORT} {
     log {
-        output file /var/log/caddy.log
+        output stdout
     }
     @ws {
         path ${PROXY_PATH}
