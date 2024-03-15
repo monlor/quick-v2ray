@@ -7,7 +7,7 @@ PROXY_PATH="${PROXY_PATH:-/}"
 PROXY_PORT="${PROXY_PORT:-80}"
 
 echo "生成Caddyfile..."
-cat > /etc/Caddyfile <<'EOF'
+cat > /etc/Caddyfile <<-EOF
 ${DOMAIN} {
   log ./caddy.log
   proxy ${PROXY_PATH} :${PROXY_PORT} {
