@@ -42,7 +42,12 @@ cat > /etc/v2ray.json <<-EOF
 }
 EOF
 
-echo "v2ray url: vmess://$(echo auto:${UUID}@${DOMAIN}:${PROXY_PORT} | base64)?remarks=${DOMAIN}&obfsParam=www.microsoft.com&path=/&obfs=websocket&tfo=1&alterId=${ALTER_ID}"
+v2ray_url="vmess://$(echo auto:${UUID}@${DOMAIN}:${PROXY_PORT} | base64)?remarks=${DOMAIN}&obfsParam=www.microsoft.com&path=/&obfs=websocket&tfo=1&alterId=${ALTER_ID}"
+
+echo "v2ray url: ${v2ray_url}"
+
+echo "v2ray qrcode:"
+qrterminal ${v2ray_url}
 
 echo "启动v2ray..."
 /usr/bin/v2ray run -config /etc/v2ray.json
