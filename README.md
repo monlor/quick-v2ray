@@ -10,7 +10,7 @@
 
 ```bash
 docker run -d \
-  --name trojan \
+  --name v2ray \
   -p 80:80/tcp \
   -e DOMAIN=你的域名 \
   -e UUID=$(cat /proc/sys/kernel/random/uuid) \
