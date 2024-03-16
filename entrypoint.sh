@@ -5,9 +5,14 @@ ALTER_ID="${ALTER_ID:-64}"
 PROXY_PATH="${PROXY_PATH:-/}"
 PROXY_PORT="${PROXY_PORT:-80}"
 
+export V2RAY_VMESS_AEAD_FORCED=${V2RAY_VMESS_AEAD_FORCED:-false}
+
 echo "生成v2ray配置..."
 cat > /etc/v2ray.json <<-EOF
 {
+  "log": {
+    "loglevel": "${LOG_LEVEL:-error}"
+  },
   "inbounds": [
     {
       "port": ${PROXY_PORT},
